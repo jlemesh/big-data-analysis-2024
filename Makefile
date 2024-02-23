@@ -1,8 +1,8 @@
-generuoti:
-	xelatex magistrinis.tex
-	biber magistrinis
-	xelatex magistrinis.tex
-	open magistrinis.pdf || xdg-open magistrinis.pdf
+task_optional_0223:
+	xelatex -output-directory=build task_optional_0223.tex
+	biber build/task_optional_0223
+	xelatex -output-directory=build task_optional_0223.tex
+	open build/task_optional_0223.pdf || xdg-open build/task_optional_0223.pdf
 
 ubuntu:
 	echo "Diegiamas LaTeX (PdfLaTeX, XeTeX ir kt.)"
