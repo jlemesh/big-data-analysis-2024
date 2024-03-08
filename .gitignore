@@ -4,3 +4,4 @@ data/*
 build/*
 !build/.gitkeep
 .DS_Store
+src/__pycache__
