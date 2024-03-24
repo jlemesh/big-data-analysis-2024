@@ -11,8 +11,20 @@ import numpy as np
 input_dir = './data/data_set_VU_test1/Images'
 output_dir = './data/assignment1_output'
 
-# ChatGPT
 def convert_to_binary(img):
+  """Convert an image to binary with pixel values either 1 or 0.
+  Created with help from ChatGPT.
+
+  Parameters
+  ----------
+  img : list
+    An array with image data (2d)
+
+  Returns
+  -------
+  binary_img : list
+    An array with binary image data (2d)
+  """
   # Calculate the histogram of the grayscale image
   hist = cv2.calcHist([img], [0], None, [256], [0, 256])
 
@@ -28,17 +40,56 @@ def convert_to_binary(img):
   return binary_img
 
 def black_and_white(input_file, output_file):
-    img = cv2.imread(input_file, cv2.IMREAD_GRAYSCALE)
-    binary_img = convert_to_binary(img)
-    cv2.imwrite(output_file, binary_img)
+  """Convert image to black and white and write it to new file.
+
+  Parameters
+  ----------
+  input_file : str
+    A file path of input image
+  output_file : str
+    A file path of output image
+
+  Returns
+  -------
+  None
+  """
+  img = cv2.imread(input_file, cv2.IMREAD_GRAYSCALE)
+  binary_img = convert_to_binary(img)
+  cv2.imwrite(output_file, binary_img)
 
 def blur(input_file, output_file):
+  """Add blur to the image and write it to new file.
+
+  Parameters
+  ----------
+  input_file : str
+    A file path of input image
+  output_file : str
+    A file path of output image
+
+  Returns
+  -------
+  None
+  """
   img = cv2.imread(input_file)
   blurred = cv2.GaussianBlur(img,(5,5),0)
   cv2.imwrite(output_file, blurred)
 
-# ChatGPT
 def noise(input_file, output_file):
+  """Add noise to the image and write it to new file.
+  Created with help from ChatGPT.
+
+  Parameters
+  ----------
+  input_file : str
+    A file path of input image
+  output_file : str
+    A file path of output image
+
+  Returns
+  -------
+  None
+  """
   img = cv2.imread(input_file, cv2.IMREAD_GRAYSCALE)
 
   binary_img = convert_to_binary(img)
@@ -54,22 +105,49 @@ def noise(input_file, output_file):
 
   cv2.imwrite(output_file, noise_img)
 
-# ChatGPT
 def add_noise(binary_img, noise_pixel_count):
-    noise_img = binary_img.copy()
+  """Add noise to the image.
+  Created with help from ChatGPT.
 
-    # Generate a mask with 10% of the pixels set to 1 (noise)
-    mask = np.zeros_like(binary_img)
-    mask[np.random.choice(range(mask.shape[0]), size=noise_pixel_count), 
-         np.random.choice(range(mask.shape[1]), size=noise_pixel_count)] = 1
+  Parameters
+  ----------
+  binary_img : list
+    An image to add noise to (with pixel values either 1 or 0)
+  noise_pixel_count : int
+    The count of pixels that constitute noise
 
-    # Apply the mask to the black pixels in the binary image
-    noise_img[mask == 1] = 0
+  Returns
+  -------
+  noise_img : list
+    An array of image data with noise added to it
+  """
+  noise_img = binary_img.copy()
 
-    return noise_img
+  # Generate a mask with 10% of the pixels set to 1 (noise)
+  mask = np.zeros_like(binary_img)
+  mask[np.random.choice(range(mask.shape[0]), size=noise_pixel_count), 
+        np.random.choice(range(mask.shape[1]), size=noise_pixel_count)] = 1
+
+  # Apply the mask to the black pixels in the binary image
+  noise_img[mask == 1] = 0
+
+  return noise_img
 
 @tw.timeit
 def parallel(func, cpu_count):
+  """Process a task using parallel processing (multiprocessor)
+
+  Parameters
+  ----------
+  func : func
+    A function to execute, either noise(), blur() or black_and_white()
+  cpu_count : int
+    The count of CPUs
+
+  Returns
+  -------
+  None
+  """
   pool = Pool(cpu_count)
   data = [(os.path.join(input_dir, file), os.path.join(output_dir, func.__name__, file)) for file in os.listdir(input_dir)]
   pool.starmap(func, data)
@@ -78,6 +156,19 @@ def parallel(func, cpu_count):
 
 @tw.timeit
 def multithreaded(func, thread_count):
+  """Process a task using concurrent processing (multithreading)
+
+  Parameters
+  ----------
+  func : func
+    A function to execute, either noise(), blur() or black_and_white()
+  thread_count : int
+    The count of threads
+
+  Returns
+  -------
+  None
+  """
   print(f'Executing {func.__name__}')
   pool = ThreadPool(thread_count)
   data = [(os.path.join(input_dir, file), os.path.join(output_dir, func.__name__, file)) for file in os.listdir(input_dir)]
@@ -86,6 +177,21 @@ def multithreaded(func, thread_count):
   pool.join()
 
 def execute(executor, counts, name):
+  """Main function to execute the tasks and draw diagrams of results
+
+  Parameters
+  ----------
+  executor : func
+    A function to execute, either parallel() or multithreaded()
+  counts : int
+    The count of CPUs or threads, depending on th executor
+  name : string
+    The name of processing units, either 'CPUs' or 'threads'
+
+  Returns
+  -------
+  None
+  """
   timings_bw = {}
   timings_b = {}
   timings_n = {}
