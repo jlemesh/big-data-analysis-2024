@@ -200,12 +200,13 @@ def execute(executor, counts, name):
     r, timings_bw[count] = executor(black_and_white, count)
     r, timings_b[count] = executor(blur, count)
     r, timings_n[count] = executor(noise, count)
-  plt.plot(timings_bw.keys(), timings_bw.values())
-  plt.plot(timings_b.keys(), timings_b.values())
-  plt.plot(timings_n.keys(), timings_n.values())
+  plt.plot(timings_bw.keys(), timings_bw.values(), label="black and white")
+  plt.plot(timings_b.keys(), timings_b.values(), label="blur")
+  plt.plot(timings_n.keys(), timings_n.values(), label="noise")
   plt.title(f'Processing time vs number of {name}')
   plt.ylabel('Processing time (seconds)')
   plt.xlabel(f'Number of {name}')
+  plt.legend(loc="upper left")
   plt.show()
 
 if __name__ == '__main__':
